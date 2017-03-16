@@ -1,11 +1,8 @@
 package com.github.mhubbard.hnefatafl;
 
 
-public enum PointType {
+public enum PieceType {
 
-    EMPTY,
-    CORNER,
-    THRONE,
     ATTACKER,
     DEFENDER,
     KING;
