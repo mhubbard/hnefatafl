@@ -62,7 +62,7 @@ public class Point {
                 for(int i = point.x; i < x; i++)
                     pointsBetween.add(new Point(i + 1, y));
             }
-        } else return null;
+        }
         return pointsBetween;
     }
 }

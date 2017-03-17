@@ -39,28 +39,28 @@ public abstract class Board {
 
         boolean isAttacker = false;
         PieceType pieceType;
-        if(getDefenders().containsKey(from)) {
-            pieceType = getDefenders().get(from);
-        } else if(getAttackers().containsKey(from)) {
+        if(defenders.containsKey(from)) {
+            pieceType = defenders.get(from);
+        } else if(attackers.containsKey(from)) {
             isAttacker = true;
-            pieceType = getAttackers().get(from);
+            pieceType = attackers.get(from);
         } else return false;
 
         if(pieceType != PieceType.KING && (getCornerPoints().contains(to) || getThrone().equals(to)))
             return false;
 
         for(Point point: from.getPointsBetween(to))
-            if(getAttackers().containsKey(point) || getDefenders().containsKey(point))
+            if(attackers.containsKey(point) || defenders.containsKey(point))
                 return false;
 
         if(isAttacker) {
-            getAttackers().remove(from);
-            getAttackers().put(to, pieceType);
-            checkCaptures(to, getDefenders(), getAttackers()).forEach(getDefenders()::remove);
+            attackers.remove(from);
+            attackers.put(to, pieceType);
+            checkCaptures(to, defenders, attackers).forEach(defenders::remove);
         } else {
-            getDefenders().remove(from);
-            getDefenders().put(to, pieceType);
-            checkCaptures(to, getAttackers(), getDefenders()).forEach(getAttackers()::remove);
+            defenders.remove(from);
+            defenders.put(to, pieceType);
+            checkCaptures(to, attackers, defenders).forEach(attackers::remove);
             if(pieceType == PieceType.KING)
                 king = to;
         }
@@ -88,7 +88,7 @@ public abstract class Board {
         Point adjacentEast = new Point(to.getX() + 1 , to.getY());
         if(to.getX() < 10 && enemyPieces.containsKey(adjacentEast)) {
             if(!king.equals(adjacentEast)) {
-                Point sandwichingPoint = new Point(to.getX() - 2, to.getY());
+                Point sandwichingPoint = new Point(to.getX() + 2, to.getY());
                 if (isAllyOrHostile(sandwichingPoint, alliedPieces))
                     captures.add(adjacentEast);
             } else if(checkKingCaptured())
@@ -115,6 +115,10 @@ public abstract class Board {
         return captures;
     }
 
+    /**
+     * Check if the king is captured (attackers/hostile spaces surrounding all 4 sides).
+     * @return true if the king is surrounded, false otherwise.
+     */
     private boolean checkKingCaptured() {
         Set<Point> adjacentPoints = king.adjacentPoints(getDimension());
         return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, attackers))
@@ -183,7 +187,7 @@ public abstract class Board {
                     print = 'A';
 
                 if(defenders.containsKey(point)) {
-                    PieceType type = getDefenders().get(point);
+                    PieceType type = defenders.get(point);
                     if (type == PieceType.DEFENDER)
                         print = 'D';
                     else if (type == PieceType.KING)
