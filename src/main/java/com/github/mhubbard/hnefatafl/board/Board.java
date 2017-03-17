@@ -24,8 +24,7 @@ public abstract class Board {
     public HashMap<Point, PieceType> getDefenders() {
         return defenders;
     }
-
-
+    
     /**
      * Move the piece occupying the from point.
      * @param from Point on the board the piece is moving from.
@@ -49,7 +48,7 @@ public abstract class Board {
         if(pieceType != PieceType.KING && (getCornerPoints().contains(to) || getThrone().equals(to)))
             return false;
 
-        for(Point point: from.getPointsBetween(to))
+        for(Point point: from.getPathTo(to))
             if(attackers.containsKey(point) || defenders.containsKey(point))
                 return false;
 
