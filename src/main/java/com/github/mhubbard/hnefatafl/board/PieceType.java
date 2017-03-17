@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl;
+package com.github.mhubbard.hnefatafl.board;
 
 
 public enum PieceType {

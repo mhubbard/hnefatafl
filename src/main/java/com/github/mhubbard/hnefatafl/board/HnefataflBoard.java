@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl;
+package com.github.mhubbard.hnefatafl.board;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,23 +6,31 @@ import java.util.Set;
 
 public class HnefataflBoard extends Board {
 
-    private static final int NUM_RESTRICTED_POINTS = 5;
     private static final int NUM_ATTACKERS = 24;
     private static final int NUM_DEFENDERS = 11;
 
-    private static Set<Point> restrictedPoints;
+    private static Set<Point> edges;
+    private static Set<Point> cornerPoints;
     private static final Point THRONE = new Point(6, 6);
 
     public HnefataflBoard() {
-        restrictedPoints = new HashSet<>(NUM_RESTRICTED_POINTS);
+        edges = new HashSet<>(getDimension() * 4);
+        cornerPoints = new HashSet<>(4);
         attackers = new HashMap<>(NUM_ATTACKERS);
         defenders = new HashMap<>(NUM_DEFENDERS);
+        king = new Point(6, 6);
 
-        restrictedPoints.add(new Point(1, 1));
-        restrictedPoints.add(new Point(1, 11));
-        restrictedPoints.add(new Point(11, 1));
-        restrictedPoints.add(new Point(11, 11));
-        restrictedPoints.add(THRONE);
+        for(int i = 1; i <= getDimension(); i++) {
+            edges.add(new Point(i, 1));
+            edges.add(new Point(i, 11));
+            edges.add(new Point(1, i));
+            edges.add(new Point(11, i));
+        }
+
+        cornerPoints.add(new Point(1, 1));
+        cornerPoints.add(new Point(1, 11));
+        cornerPoints.add(new Point(11, 1));
+        cornerPoints.add(new Point(11, 11));
 
         attackers.put(new Point(1, 4), PieceType.ATTACKER);
         attackers.put(new Point(1, 5), PieceType.ATTACKER);
@@ -73,8 +81,13 @@ public class HnefataflBoard extends Board {
     }
 
     @Override
-    public final Set<Point> getRestrictedPoints() {
-        return restrictedPoints;
+    public Set<Point> getEdges() {
+        return edges;
+    }
+
+    @Override
+    public final Set<Point> getCornerPoints() {
+        return cornerPoints;
     }
 
     @Override
