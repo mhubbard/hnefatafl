@@ -4,16 +4,22 @@ import com.github.mhubbard.hnefatafl.board.Board;
 import com.github.mhubbard.hnefatafl.board.HnefataflBoard;
 import com.github.mhubbard.hnefatafl.board.PieceType;
 import com.github.mhubbard.hnefatafl.board.Point;
+import com.github.mhubbard.hnefatafl.rules.FetlarRules;
+import com.github.mhubbard.hnefatafl.rules.Rules;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Game {
 
     private Board board;
+    private Rules rules;
     private GameState state;
 
     Game() {
         board = new HnefataflBoard();
+        rules = new FetlarRules();
         state = GameState.ATTACKERS_TURN;
     }
 
@@ -35,24 +41,32 @@ public class Game {
         if(success) {
             if(state == GameState.ATTACKERS_TURN) {
                 state = GameState.DEFENDERS_TURN;
-                if(board.checkEncircle(board.getAttackers(), board.getDefenders())
-                        || !board.getDefenders().values().contains(PieceType.KING))
+                if(!board.getDefenders().values().contains(PieceType.KING)
+                        || !canSideMove(board.getDefenders())
+                        || (rules.allowEncircle() && board.checkEncircle(board.getAttackers(), board.getDefenders())))
                     state = GameState.ATTACKERS_WIN;
             } else if(state == GameState.DEFENDERS_TURN) {
                 state = GameState.ATTACKERS_TURN;
-                Point king = board.getDefenders().entrySet().stream()
-                                  .filter(entry -> entry.getValue() == PieceType.KING)
-                                  .map(Map.Entry::getKey)
-                                  .findFirst().orElseThrow(RuntimeException::new);
-                if(board.getCornerPoints().contains(king)
-                   || board.checkEncircle(board.getDefenders(), board.getAttackers()))
+                if(board.getCornerPoints().contains(board.getKing())
+                        || !canSideMove(board.getAttackers())
+                        || (rules.allowEncircle() && board.checkEncircle(board.getDefenders(), board.getAttackers())))
                     state = GameState.DEFENDERS_WIN;
             }
         }
         return success;
     }
 
+    /**
+     * Check if there are any available moves for a side.
+     * @param pieces All of a side's pieces.
+     * @return true if there are any possible moves for at least one the side's pieces, false otherwise.
+     */
+    private boolean canSideMove(HashMap<Point, PieceType> pieces) {
+        return pieces.keySet().stream().filter(board::pieceCanMove).collect(Collectors.toSet()).isEmpty();
+    }
+
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         Game game = new Game();
         game.board.printBoard();
         System.out.print("\n\n");
@@ -60,5 +74,6 @@ public class Game {
         game.movePiece(new Point(6, 4), new Point(6, 3));
         game.movePiece(new Point(11, 8), new Point(7, 8));
         game.board.printBoard();
+        System.out.print("\n\n"+ (System.currentTimeMillis() - start));
     }
 }

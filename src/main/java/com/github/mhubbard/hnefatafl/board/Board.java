@@ -24,6 +24,10 @@ public abstract class Board {
     public HashMap<Point, PieceType> getDefenders() {
         return defenders;
     }
+
+    public Point getKing() {
+        return king;
+    }
     
     /**
      * Move the piece occupying the from point.
@@ -115,28 +119,6 @@ public abstract class Board {
     }
 
     /**
-     * Check if the king is captured (attackers/hostile spaces surrounding all 4 sides).
-     * @return true if the king is surrounded, false otherwise.
-     */
-    private boolean checkKingCaptured() {
-        Set<Point> adjacentPoints = king.adjacentPoints(getDimension());
-        return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, attackers))
-                                      .collect(Collectors.toSet())
-                                      .size() == 4;
-    }
-
-    /**
-     * Check if a point is either an ally, corner, or empty throne.
-     * @param point Point on the board to check.
-     * @param alliedPieces A map of all friendly pieces and their types.
-     * @return true if point is an ally or hostile (corner/empty throne), false otherwise.
-     */
-    private boolean isAllyOrHostile(Point point, HashMap<Point, PieceType> alliedPieces) {
-        return alliedPieces.containsKey(point) || getCornerPoints().contains(point)
-               || (getThrone().equals(point) && !getThrone().equals(king));
-    }
-
-    /**
      * Check if the opposingSide is encircled.
      * <p>
      *     A side is encircled if there is no possible path that any of their
@@ -168,6 +150,48 @@ public abstract class Board {
             checked.add(point);
         }
         return true;
+    }
+
+    /**
+     * Check if the given piece has a open spot to move to.
+     * @return true if there's at least one open space adjacent to the give point.
+     */
+    public boolean pieceCanMove(Point point) {
+        if(king.equals(point)) {
+            return !king.adjacentPoints(getDimension()).stream()
+                        .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
+                                                 || attackers.containsKey(adjacentPoint))
+                        .collect(Collectors.toSet()).isEmpty();
+        } else {
+            return !point.adjacentPoints(getDimension()).stream()
+                         .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
+                         || attackers.containsKey(adjacentPoint)
+                         || getCornerPoints().contains(adjacentPoint)
+                         || getThrone().equals(adjacentPoint))
+                    .collect(Collectors.toSet()).isEmpty();
+        }
+    }
+
+    /**
+     * Check if the king is captured (attackers/hostile spaces surrounding all 4 sides).
+     * @return true if the king is surrounded, false otherwise.
+     */
+    private boolean checkKingCaptured() {
+        Set<Point> adjacentPoints = king.adjacentPoints(getDimension());
+        return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, attackers))
+                       .collect(Collectors.toSet())
+                       .size() == 4;
+    }
+
+    /**
+     * Check if a point is either an ally, corner, or empty throne.
+     * @param point Point on the board to check.
+     * @param alliedPieces A map of all friendly pieces and their types.
+     * @return true if point is an ally or hostile (corner/empty throne), false otherwise.
+     */
+    private boolean isAllyOrHostile(Point point, HashMap<Point, PieceType> alliedPieces) {
+        return alliedPieces.containsKey(point) || getCornerPoints().contains(point)
+               || (getThrone().equals(point) && !getThrone().equals(king));
     }
 
     public void printBoard() {
