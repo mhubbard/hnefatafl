@@ -1,4 +1,4 @@
-# Hnefatafl
+# Tafl
 
 This mostly and educational project for me to help teach me the game of hnefatafl and to practice AI algorithms.
 

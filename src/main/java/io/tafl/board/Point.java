@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl.board;
+package io.tafl.board;
 
 import lombok.Value;
 

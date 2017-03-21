@@ -1,14 +1,13 @@
-package com.github.mhubbard.hnefatafl;
+package io.tafl;
 
-import com.github.mhubbard.hnefatafl.board.Board;
-import com.github.mhubbard.hnefatafl.board.HnefataflBoard;
-import com.github.mhubbard.hnefatafl.board.PieceType;
-import com.github.mhubbard.hnefatafl.board.Point;
-import com.github.mhubbard.hnefatafl.rules.FetlarRules;
-import com.github.mhubbard.hnefatafl.rules.Rules;
+import io.tafl.board.Board;
+import io.tafl.board.HnefataflBoard;
+import io.tafl.board.PieceType;
+import io.tafl.board.Point;
+import io.tafl.rules.FetlarRules;
+import io.tafl.rules.Rules;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Game {

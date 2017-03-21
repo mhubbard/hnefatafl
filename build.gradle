@@ -1,4 +1,4 @@
-group 'com.github.mhubbard'
+group 'io.tafl'
 version '0.1'
 
 apply plugin: 'java'

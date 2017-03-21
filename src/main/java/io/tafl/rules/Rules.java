@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl.rules;
+package io.tafl.rules;
 
 public interface Rules {
 

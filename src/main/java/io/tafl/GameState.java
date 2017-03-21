@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl;
+package io.tafl;
 
 public enum GameState {
 

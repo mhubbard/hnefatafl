@@ -1,4 +1,4 @@
-package com.github.mhubbard.hnefatafl.board;
+package io.tafl.board;
 
 import java.util.HashMap;
 import java.util.HashSet;
