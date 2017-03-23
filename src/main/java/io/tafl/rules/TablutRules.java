@@ -1,10 +1,10 @@
 package io.tafl.rules;
 
-public class CopenhagenRules implements Rules {
+public class TablutRules implements Rules {
 
     @Override
     public boolean allowEncircle() {
-        return true;
+        return false;
     }
 
     @Override
@@ -14,6 +14,6 @@ public class CopenhagenRules implements Rules {
 
     @Override
     public boolean canKingReenterThrone() {
-        return true;
+        return false;
     }
 }

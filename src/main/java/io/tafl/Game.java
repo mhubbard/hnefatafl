@@ -17,8 +17,8 @@ public class Game {
     private GameState state;
 
     Game() {
-        board = new HnefataflBoard();
         rules = new FetlarRules();
+        board = new HnefataflBoard(rules);
         state = GameState.ATTACKERS_TURN;
     }
 

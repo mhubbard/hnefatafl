@@ -1,5 +1,7 @@
 package io.tafl.board;
 
+import io.tafl.rules.Rules;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,24 +15,25 @@ public class HnefataflBoard extends Board {
     private static Set<Point> cornerPoints;
     private static final Point THRONE = new Point(6, 6);
 
-    public HnefataflBoard() {
+    public HnefataflBoard(Rules rules) {
+        super(rules);
         edges = new HashSet<>(getDimension() * 4);
         cornerPoints = new HashSet<>(4);
         attackers = new HashMap<>(NUM_ATTACKERS);
         defenders = new HashMap<>(NUM_DEFENDERS);
-        king = new Point(6, 6);
+        king = THRONE;
 
         for(int i = 1; i <= getDimension(); i++) {
             edges.add(new Point(i, 1));
-            edges.add(new Point(i, 11));
+            edges.add(new Point(i, getDimension()));
             edges.add(new Point(1, i));
-            edges.add(new Point(11, i));
+            edges.add(new Point(getDimension(), i));
         }
 
         cornerPoints.add(new Point(1, 1));
-        cornerPoints.add(new Point(1, 11));
-        cornerPoints.add(new Point(11, 1));
-        cornerPoints.add(new Point(11, 11));
+        cornerPoints.add(new Point(1, getDimension()));
+        cornerPoints.add(new Point(getDimension(), 1));
+        cornerPoints.add(new Point(getDimension(), getDimension()));
 
         attackers.put(new Point(1, 4), PieceType.ATTACKER);
         attackers.put(new Point(1, 5), PieceType.ATTACKER);

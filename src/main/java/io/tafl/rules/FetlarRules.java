@@ -14,7 +14,7 @@ public class FetlarRules implements Rules {
     }
 
     @Override
-    public boolean isStrongKing() {
+    public boolean canKingReenterThrone() {
         return true;
     }
 }
