@@ -1,8 +1,7 @@
 package io.tafl;
 
 import io.tafl.board.Board;
-import io.tafl.board.BrandubBoard;
-import io.tafl.board.HnefataflBoard;
+import io.tafl.board.impl.BrandubBoard;
 import io.tafl.board.PieceType;
 import io.tafl.board.Point;
 import io.tafl.rules.FetlarRules;

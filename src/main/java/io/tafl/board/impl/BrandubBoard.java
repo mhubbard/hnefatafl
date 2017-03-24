@@ -1,5 +1,8 @@
-package io.tafl.board;
+package io.tafl.board.impl;
 
+import io.tafl.board.Board;
+import io.tafl.board.PieceType;
+import io.tafl.board.Point;
 import io.tafl.rules.Rules;
 
 import java.util.HashMap;
