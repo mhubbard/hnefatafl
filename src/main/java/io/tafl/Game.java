@@ -1,6 +1,7 @@
 package io.tafl;
 
 import io.tafl.board.Board;
+import io.tafl.board.BrandubBoard;
 import io.tafl.board.HnefataflBoard;
 import io.tafl.board.PieceType;
 import io.tafl.board.Point;
@@ -18,7 +19,7 @@ public class Game {
 
     Game() {
         rules = new FetlarRules();
-        board = new HnefataflBoard(rules);
+        board = new BrandubBoard(rules);
         state = GameState.ATTACKERS_TURN;
     }
 
