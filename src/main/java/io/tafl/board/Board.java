@@ -1,5 +1,7 @@
 package io.tafl.board;
 
+import io.tafl.rules.Rules;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -8,6 +10,7 @@ import java.util.stream.Collectors;
 
 public abstract class Board {
 
+    protected Rules rules;
     protected HashMap<Point, PieceType> attackers;
     protected HashMap<Point, PieceType> defenders;
     protected Point king;
@@ -16,6 +19,10 @@ public abstract class Board {
     public abstract Set<Point> getEdges();
     public abstract Set<Point> getCornerPoints();
     public abstract Point getThrone();
+
+    protected Board(Rules rules) {
+        this.rules = rules;
+    }
 
     public HashMap<Point, PieceType> getAttackers() {
         return attackers;
@@ -49,7 +56,10 @@ public abstract class Board {
             pieceType = attackers.get(from);
         } else return false;
 
-        if(pieceType != PieceType.KING && (getCornerPoints().contains(to) || getThrone().equals(to)))
+        if(pieceType != PieceType.KING && getCornerPoints().contains(to))
+            return false;
+
+        if(getThrone().equals(to) && (pieceType != PieceType.KING || !rules.canKingReenterThrone()))
             return false;
 
         for(Point point: from.getPathTo(to))
@@ -158,17 +168,17 @@ public abstract class Board {
      */
     public boolean pieceCanMove(Point point) {
         if(king.equals(point)) {
-            return !king.adjacentPoints(getDimension()).stream()
-                        .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
+            return king.adjacentPoints(getDimension()).stream()
+                       .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
                                                  || attackers.containsKey(adjacentPoint))
-                        .collect(Collectors.toSet()).isEmpty();
+                       .collect(Collectors.toSet()).isEmpty();
         } else {
-            return !point.adjacentPoints(getDimension()).stream()
-                         .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
-                         || attackers.containsKey(adjacentPoint)
-                         || getCornerPoints().contains(adjacentPoint)
-                         || getThrone().equals(adjacentPoint))
-                    .collect(Collectors.toSet()).isEmpty();
+            return point.adjacentPoints(getDimension()).stream()
+                        .filter(adjacentPoint -> defenders.containsKey(adjacentPoint)
+                                                  || attackers.containsKey(adjacentPoint)
+                                                  || getCornerPoints().contains(adjacentPoint)
+                                                  || getThrone().equals(adjacentPoint))
+                        .collect(Collectors.toSet()).isEmpty();
         }
     }
 
@@ -179,8 +189,8 @@ public abstract class Board {
     private boolean checkKingCaptured() {
         Set<Point> adjacentPoints = king.adjacentPoints(getDimension());
         return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, attackers))
-                       .collect(Collectors.toSet())
-                       .size() == 4;
+                                      .collect(Collectors.toSet())
+                                      .size() == 4;
     }
 
     /**
@@ -190,13 +200,18 @@ public abstract class Board {
      * @return true if point is an ally or hostile (corner/empty throne), false otherwise.
      */
     private boolean isAllyOrHostile(Point point, HashMap<Point, PieceType> alliedPieces) {
-        return alliedPieces.containsKey(point) || getCornerPoints().contains(point)
-               || (getThrone().equals(point) && !getThrone().equals(king));
+        return !(king.equals(point) && rules.isWeaponlessKing())
+               && (alliedPieces.containsKey(point)
+                   || getCornerPoints().contains(point)
+                   || (getThrone().equals(point) && !getThrone().equals(king)));
     }
 
     public void printBoard() {
         for(int i = getDimension(); i > 0; i--) {
-            System.out.print("+-+-+-+-+-+-+-+-+-+-+-+\n");
+            for(int j = 1; j <= getDimension(); j++) {
+                System.out.print("+-");
+            }
+            System.out.print("+\n");
             for(int j = 1; j <= getDimension(); j++) {
                 System.out.print('|');
                 char print = ' ';
@@ -222,6 +237,9 @@ public abstract class Board {
             System.out.print('|');
             System.out.print('\n');
         }
-        System.out.println("+-+-+-+-+-+-+-+-+-+-+-+\n");
+        for(int j = 1; j <= getDimension(); j++) {
+            System.out.print("+-");
+        }
+        System.out.print("+\n");
     }
 }

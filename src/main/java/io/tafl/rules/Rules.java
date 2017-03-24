@@ -4,5 +4,5 @@ public interface Rules {
 
     public boolean allowEncircle();
     public boolean isWeaponlessKing();
-    public boolean isStrongKing();
+    public boolean canKingReenterThrone();
 }
