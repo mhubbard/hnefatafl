@@ -5,8 +5,6 @@ import io.tafl.board.PieceType;
 import io.tafl.board.Point;
 import io.tafl.rules.Rules;
 
-import io.tafl.rules.Rules;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;

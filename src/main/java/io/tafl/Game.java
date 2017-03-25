@@ -1,9 +1,9 @@
 package io.tafl;
 
 import io.tafl.board.Board;
-import io.tafl.board.impl.BrandubBoard;
 import io.tafl.board.PieceType;
 import io.tafl.board.Point;
+import io.tafl.board.impl.HnefataflBoard;
 import io.tafl.rules.FetlarRules;
 import io.tafl.rules.Rules;
 
@@ -18,20 +18,21 @@ public class Game {
 
     Game() {
         rules = new FetlarRules();
-        board = new BrandubBoard(rules);
+        board = new HnefataflBoard(rules);
         state = GameState.ATTACKERS_TURN;
     }
 
     public boolean movePiece(Point from, Point to) {
+        MovePiece movePiece = new MovePiece(rules, board);
         boolean success = false;
         switch(state) {
             case ATTACKERS_TURN:
                 if(board.getAttackers().containsKey(from))
-                    success = board.movePiece(from, to);
+                    success = movePiece.movePiece(from, to);
                 break;
             case DEFENDERS_TURN:
                 if(board.getDefenders().containsKey(from))
-                    success = board.movePiece(from, to);
+                    success = movePiece.movePiece(from, to);
                 break;
             case ATTACKERS_WIN:
             case DEFENDERS_WIN:
@@ -73,6 +74,6 @@ public class Game {
         game.movePiece(new Point(6, 4), new Point(6, 3));
         game.movePiece(new Point(11, 8), new Point(7, 8));
         game.board.printBoard();
-        System.out.print("\n\n"+ (System.currentTimeMillis() - start));
+        System.out.println("\n\n"+ (System.currentTimeMillis() - start));
     }
 }
