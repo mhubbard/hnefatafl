@@ -1,7 +1,7 @@
 # Tafl
 
 This mostly and educational project for me to help teach me the game of hnefatafl and to practice AI algorithms.
-However the current plan is to wrap this engine into a playable website to experiment and possibly and android app.
+However the current plan is to wrap this engine into a playable website and possibly and android app.
 
 So far I've tackled the basic rules of most tafl games and a few of the board sizes, rules I still need to implements are:
 
