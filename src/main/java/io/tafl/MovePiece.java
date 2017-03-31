@@ -75,41 +75,37 @@ public class MovePiece {
         Set<Point> captures = new HashSet<>(3);
         Point adjacentWest = new Point(to.getX() - 1 , to.getY());
         if(to.getX() > 2 && enemyPieces.containsKey(adjacentWest)) {
-            if(!board.getKing().equals(adjacentWest)) {
-                Point sandwichingPoint = new Point(to.getX() - 2, to.getY());
-                if (isAllyOrHostile(sandwichingPoint, alliedPieces))
-                    captures.add(adjacentWest);
-            } else if(checkKingCaptured())
-                captures.add(adjacentWest);
+            checkCapture(adjacentWest, new Point(to.getX() - 2, to.getY()), alliedPieces, captures);
         }
         Point adjacentEast = new Point(to.getX() + 1 , to.getY());
         if(to.getX() < 10 && enemyPieces.containsKey(adjacentEast)) {
-            if(!board.getKing().equals(adjacentEast)) {
-                Point sandwichingPoint = new Point(to.getX() + 2, to.getY());
-                if (isAllyOrHostile(sandwichingPoint, alliedPieces))
-                    captures.add(adjacentEast);
-            } else if(checkKingCaptured())
-                captures.add(adjacentEast);
+            checkCapture(adjacentEast, new Point(to.getX() + 2, to.getY()), alliedPieces, captures);
         }
         Point adjacentNorth = new Point(to.getX() , to.getY() + 1);
         if(to.getY() < 10 && enemyPieces.containsKey(adjacentNorth)) {
-            if(!board.getKing().equals(adjacentNorth)) {
-                Point sandwichingPoint = new Point(to.getX(), to.getY() + 2);
-                if (isAllyOrHostile(sandwichingPoint, alliedPieces))
-                    captures.add(adjacentNorth);
-            } else if(checkKingCaptured())
-                captures.add(adjacentNorth);
+            checkCapture(adjacentNorth, new Point(to.getX(), to.getY() + 2), alliedPieces, captures);
         }
         Point adjacentSouth = new Point(to.getX() , to.getY() - 1);
         if(to.getY() > 2 && enemyPieces.containsKey(adjacentSouth)) {
-            if(!board.getKing().equals(adjacentSouth)) {
-                Point sandwichingPoint = new Point(to.getX(), to.getY() - 2);
-                if (isAllyOrHostile(sandwichingPoint, alliedPieces))
-                    captures.add(adjacentSouth);
-            } else if(checkKingCaptured())
-                captures.add(adjacentSouth);
+            checkCapture(adjacentSouth, new Point(to.getX(), to.getY() - 2), alliedPieces, captures);
         }
         return captures;
+    }
+
+    /**
+     * Helper method to checkCaptures, checking if a point is sandwiched between two enemy pieces.
+     * Do not call outside of checkCaptures.
+     * @param adjacent Potentially captured point.
+     * @param sandwichingPoint Point on the other side of the adjacent point.
+     * @param alliedPieces Pieces allied to the piece that was moved.
+     * @param captures Set of captured points.
+     */
+    private void checkCapture(Point adjacent, Point sandwichingPoint, HashMap<Point, PieceType> alliedPieces, Set<Point> captures) {
+        if(!board.getKing().equals(adjacent)) {
+            if (isAllyOrHostile(sandwichingPoint, alliedPieces))
+                captures.add(adjacent);
+        } else if(checkKingCaptured())
+            captures.add(adjacent);
     }
 
     /**
@@ -119,8 +115,8 @@ public class MovePiece {
     private boolean checkKingCaptured() {
         Set<Point> adjacentPoints = board.getKing().adjacentPoints(board.getDimension());
         return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, board.getAttackers()))
-                       .collect(Collectors.toSet())
-                       .size() == 4;
+                                      .collect(Collectors.toSet())
+                                      .size() == 4;
     }
 
     /**
@@ -135,5 +131,4 @@ public class MovePiece {
                    || board.getCornerPoints().contains(point)
                    || (board.getThrone().equals(point) && !board.getThrone().equals(board.getKing())));
     }
-
 }
