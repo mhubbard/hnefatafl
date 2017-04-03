@@ -12,5 +12,6 @@ So far I've tackled the basic rules of most tafl games and a few of the board si
 - repetition draws/losses
 - no capture draw (no captures in last x turns)
 - king moving one piece at a time
+- bezerker rules
 
 If bugs are found please notify me via an issue and if you'd like to tackle that bug or any of the todo's above pull requests are welcome.
