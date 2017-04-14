@@ -105,10 +105,13 @@ public class MovePiece {
      * @param captures Set of captured points.
      */
     private void checkCapture(Point adjacent, Point sandwichingPoint, HashMap<Point, PieceType> alliedPieces, Set<Point> captures) {
-        if(!board.getKing().equals(adjacent)) {
+        if(!board.getKing().equals(adjacent)
+           || (rules.isWeakKing()
+               && !board.getThrone().equals(board.getKing())
+               && !board.getKing().adjacentPoints(board.getDimension()).contains(board.getThrone()))) {
             if (isAllyOrHostile(sandwichingPoint, alliedPieces))
                 captures.add(adjacent);
-        } else if(checkKingCaptured())
+        } else if(checkKingSurrounded())
             captures.add(adjacent);
     }
 
@@ -116,7 +119,7 @@ public class MovePiece {
      * Check if the board.getKing() is captured (board.getAttackers()/hostile spaces surrounding all 4 sides).
      * @return true if the board.getKing() is surrounded, false otherwise.
      */
-    private boolean checkKingCaptured() {
+    private boolean checkKingSurrounded() {
         Set<Point> adjacentPoints = board.getKing().adjacentPoints(board.getDimension());
         return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, board.getAttackers()))
                                       .collect(Collectors.toSet())
