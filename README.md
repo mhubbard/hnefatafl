@@ -7,7 +7,6 @@ So far I've tackled the basic rules of most tafl games and a few of the board si
 
 - shieldwall captures
 - exit/edge forts
-- weak kings (captured the same as normal pieces except when on or next to the throne)
 - repetition draws/losses
 - no capture draw (no captures in last x turns)
 - bezerker rules
