@@ -3,6 +3,11 @@ package io.tafl.rules;
 public class CopenhagenRules implements Rules {
 
     @Override
+    public boolean edgeEscape() {
+        return false;
+    }
+
+    @Override
     public boolean allowEncircle() {
         return true;
     }
@@ -15,5 +20,10 @@ public class CopenhagenRules implements Rules {
     @Override
     public boolean canKingReenterThrone() {
         return true;
+    }
+
+    @Override
+    public boolean singleMoveKing() {
+        return false;
     }
 }
