@@ -47,13 +47,23 @@ public class Game {
                     state = GameState.ATTACKERS_WIN;
             } else if(state == GameState.DEFENDERS_TURN) {
                 state = GameState.ATTACKERS_TURN;
-                if(board.getCornerPoints().contains(board.getKing())
+                if(kingEscaped()
                         || !canSideMove(board.getAttackers())
                         || (rules.allowEncircle() && board.checkEncircle(board.getDefenders(), board.getAttackers())))
                     state = GameState.DEFENDERS_WIN;
             }
         }
         return success;
+    }
+
+    /**
+     * Check if the king has successfully escaped, by checking if it has reaches an
+     * edge or corner piece depending on rules
+     * @return true if the king escaped, false otherwise
+     */
+    private boolean kingEscaped() {
+        return (rules.edgeEscape() && board.getEdges().contains(board.getKing()))
+               || board.getCornerPoints().contains(board.getKing());
     }
 
     /**

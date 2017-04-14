@@ -40,6 +40,10 @@ public class MovePiece {
             pieceType = board.getAttackers().get(from);
         } else return false;
 
+        if(pieceType == PieceType.KING && rules.singleMoveKing()
+           && !board.getKing().adjacentPoints(board.getDimension()).contains(to))
+            return false;
+
         if(pieceType != PieceType.KING && board.getCornerPoints().contains(to))
             return false;
 

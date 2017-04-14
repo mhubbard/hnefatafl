@@ -4,6 +4,11 @@ package io.tafl.rules;
 public class FetlarRules implements Rules {
 
     @Override
+    public boolean edgeEscape() {
+        return false;
+    }
+
+    @Override
     public boolean allowEncircle() {
         return false;
     }
@@ -16,5 +21,10 @@ public class FetlarRules implements Rules {
     @Override
     public boolean canKingReenterThrone() {
         return true;
+    }
+
+    @Override
+    public boolean singleMoveKing() {
+        return false;
     }
 }
