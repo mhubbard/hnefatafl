@@ -18,6 +18,11 @@ public class CopenhagenRules implements Rules {
     }
 
     @Override
+    public boolean isWeakKing() {
+        return false;
+    }
+
+    @Override
     public boolean canKingReenterThrone() {
         return true;
     }
