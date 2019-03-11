@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BrandubBoard extends Board {
+public class BrandubhBoard extends Board {
 
     private static final int NUM_ATTACKERS = 8;
     private static final int NUM_DEFENDERS = 5;
@@ -18,7 +18,7 @@ public class BrandubBoard extends Board {
     private static Set<Point> cornerPoints;
     private static final Point THRONE = new Point(4, 4);
 
-    public BrandubBoard(Rules rules) {
+    public BrandubhBoard(Rules rules) {
         super(rules);
         edges = new HashSet<>(getDimension() * 4);
         cornerPoints = new HashSet<>(4);
