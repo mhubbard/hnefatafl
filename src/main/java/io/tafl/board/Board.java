@@ -212,6 +212,33 @@ public abstract class Board {
         }
     }
 
+    public char[][] toArray() {
+        char[][] board = new char[getDimension()][getDimension()];
+        for(int i = 0; i < getDimension(); i++) {
+            for(int j = 0; j < getDimension(); j++) {
+                board[i][j] = ' ';
+                Point point = new Point(i+1, j+1);
+
+                if(getCornerPoints().contains(point)) {
+                    board[i][j] = 'X';
+                }
+
+                if(attackers.containsKey(point))
+                    board[i][j] = 'A';
+
+                if(defenders.containsKey(point)) {
+                    PieceType type = defenders.get(point);
+                    if (type == PieceType.DEFENDER)
+                        board[i][j] = 'D';
+                    else if (type == PieceType.KING)
+                        board[i][j] = 'K';
+                }
+
+            }
+        }
+        return board;
+    }
+
     public void printBoard() {
         for(int i = getDimension(); i > 0; i--) {
             for(int j = 1; j <= getDimension(); j++) {
