@@ -3,23 +3,26 @@ package io.tafl;
 import io.tafl.board.Board;
 import io.tafl.board.PieceType;
 import io.tafl.board.Point;
-import io.tafl.board.impl.HnefataflBoard;
-import io.tafl.rules.FetlarRules;
+import io.tafl.board.impl.BrandubBoard;
+import io.tafl.rules.BrandubRules;
 import io.tafl.rules.Rules;
+
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+@Data
 public class Game {
 
     private Board board;
     private Rules rules;
     private GameState state;
 
-    Game() {
-        rules = new FetlarRules();
-        board = new HnefataflBoard(rules);
-        state = GameState.ATTACKERS_TURN;
+    public Game(Rules rules, Board board, GameState state) {
+        this.rules = rules;
+        this.board = board;
+        this.state = state;
     }
 
     public boolean movePiece(Point from, Point to) {
@@ -77,7 +80,8 @@ public class Game {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        Game game = new Game();
+        Rules rules = new BrandubRules();
+        Game game = new Game(rules, new BrandubBoard(rules), GameState.ATTACKERS_TURN);
         game.board.printBoard();
         System.out.print("\n\n");
         game.movePiece(new Point(1, 8), new Point(5, 8));
