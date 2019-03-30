@@ -36,7 +36,7 @@ public abstract class Board {
         return king;
     }
 
-    public void setKing(Point king) {
+    private void setKing(Point king) {
         this.king = king;
     }
 
@@ -51,9 +51,8 @@ public abstract class Board {
      * @return true if the opposingSide is encircled, false otherwise.
      */
     public boolean checkEncircle(HashMap<Point, PieceType> encirclingSide, HashMap<Point, PieceType> opposingSide) {
-        LinkedHashSet<Point> queue = new LinkedHashSet<>();
         Set<Point> checked = new HashSet<>(getDimension() * getDimension());
-        queue.addAll(getEdges());
+        LinkedHashSet<Point> queue = new LinkedHashSet<>(getEdges());
 
         while(!queue.isEmpty()) {
             Point point = queue.iterator().next();
@@ -72,6 +71,125 @@ public abstract class Board {
             checked.add(point);
         }
         return true;
+    }
+
+    /**
+     * Move the piece occupying the from point.
+     * @param from Point on the board the piece is moving from.
+     * @param to Point on the board the piece is moving to.
+     * @return True if valid move, false otherwise.
+     */
+    public boolean movePiece(Point from, Point to) {
+        if(from.equals(to) || !from.sharesAxisWith(to)
+           || !from.isOnBoard(getDimension()) || !to.isOnBoard(getDimension()))
+            return false;
+
+        boolean isAttacker = false;
+        PieceType pieceType;
+        if(getDefenders().containsKey(from)) {
+            pieceType = getDefenders().get(from);
+        } else if(getAttackers().containsKey(from)) {
+            isAttacker = true;
+            pieceType = getAttackers().get(from);
+        } else return false;
+
+        if(pieceType == PieceType.KING && rules.singleMoveKing()
+           && !getKing().adjacentPoints(getDimension()).contains(to))
+            return false;
+
+        if(pieceType != PieceType.KING && getCornerPoints().contains(to))
+            return false;
+
+        if(getThrone().equals(to) && (pieceType != PieceType.KING || !rules.canKingReenterThrone()))
+            return false;
+
+        for(Point point: from.getPathTo(to))
+            if(getAttackers().containsKey(point) || getDefenders().containsKey(point))
+                return false;
+
+        if(isAttacker) {
+            getAttackers().remove(from);
+            getAttackers().put(to, pieceType);
+            checkCaptures(to, getDefenders(), getAttackers()).forEach(getDefenders()::remove);
+        } else {
+            getDefenders().remove(from);
+            getDefenders().put(to, pieceType);
+            checkCaptures(to, getAttackers(), getDefenders()).forEach(getAttackers()::remove);
+            if(pieceType == PieceType.KING)
+                setKing(to);
+        }
+        return true;
+    }
+
+    /**
+     * Check if the moved piece has captured any enemy pieces.
+     * @param to The point the moved piece moved to.
+     * @param enemyPieces All enemies to the moved piece.
+     * @param alliedPieces All allies of the moved piece.
+     * @return Captured enemies.
+     */
+    private Set<Point> checkCaptures(Point to, HashMap<Point, PieceType> enemyPieces, HashMap<Point, PieceType> alliedPieces) {
+        Set<Point> captures = new HashSet<>(3);
+        Point adjacentWest = new Point(to.getX() - 1 , to.getY());
+        if(to.getX() > 2 && enemyPieces.containsKey(adjacentWest)) {
+            checkCapture(adjacentWest, new Point(to.getX() - 2, to.getY()), alliedPieces, captures);
+        }
+        Point adjacentEast = new Point(to.getX() + 1 , to.getY());
+        if(to.getX() < 10 && enemyPieces.containsKey(adjacentEast)) {
+            checkCapture(adjacentEast, new Point(to.getX() + 2, to.getY()), alliedPieces, captures);
+        }
+        Point adjacentNorth = new Point(to.getX() , to.getY() + 1);
+        if(to.getY() < 10 && enemyPieces.containsKey(adjacentNorth)) {
+            checkCapture(adjacentNorth, new Point(to.getX(), to.getY() + 2), alliedPieces, captures);
+        }
+        Point adjacentSouth = new Point(to.getX() , to.getY() - 1);
+        if(to.getY() > 2 && enemyPieces.containsKey(adjacentSouth)) {
+            checkCapture(adjacentSouth, new Point(to.getX(), to.getY() - 2), alliedPieces, captures);
+        }
+        return captures;
+    }
+
+    /**
+     * Helper method to checkCaptures, checking if a point is sandwiched between two enemy pieces.
+     * Do not call outside of checkCaptures.
+     * @param adjacent Potentially captured point.
+     * @param sandwichingPoint Point on the other side of the adjacent point.
+     * @param alliedPieces Pieces allied to the piece that was moved.
+     * @param captures Set of captured points.
+     */
+    private void checkCapture(Point adjacent, Point sandwichingPoint, HashMap<Point, PieceType> alliedPieces, Set<Point> captures) {
+        if(!getKing().equals(adjacent)
+           || (rules.isWeakKing()
+               && !getThrone().equals(getKing())
+               && !getKing().adjacentPoints(getDimension()).contains(getThrone()))) {
+            if (isAllyOrHostile(sandwichingPoint, alliedPieces))
+                captures.add(adjacent);
+        } else if(checkKingSurrounded())
+            captures.add(adjacent);
+    }
+
+    /**
+     * Check if the board.getKing() is captured (board.getAttackers()/hostile spaces surrounding all 4 sides).
+     * @return true if the board.getKing() is surrounded, false otherwise.
+     */
+    private boolean checkKingSurrounded() {
+        Set<Point> adjacentPoints = getKing().adjacentPoints(getDimension());
+        return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, getAttackers()))
+                       .collect(Collectors.toSet())
+                       .size() == 4;
+    }
+
+    /**
+     * Check if a point is either an ally, corner, or empty throne.
+     * @param point Point on the board to check.
+     * @param alliedPieces A map of all friendly pieces and their types.
+     * @return true if point is an ally or hostile (corner/empty throne), false otherwise.
+     */
+    private boolean isAllyOrHostile(Point point, HashMap<Point, PieceType> alliedPieces) {
+        return !(getKing().equals(point) && rules.isWeaponlessKing())
+               && (alliedPieces.containsKey(point)
+                   || getCornerPoints().contains(point)
+                   || (getThrone().equals(point) && !getThrone().equals(getKing())));
     }
 
     /**

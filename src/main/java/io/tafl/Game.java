@@ -3,7 +3,7 @@ package io.tafl;
 import io.tafl.board.Board;
 import io.tafl.board.PieceType;
 import io.tafl.board.Point;
-import io.tafl.board.impl.BrandubBoard;
+import io.tafl.board.impl.BrandubhBoard;
 import io.tafl.rules.BrandubRules;
 import io.tafl.rules.Rules;
 
@@ -26,16 +26,15 @@ public class Game {
     }
 
     public boolean movePiece(Point from, Point to) {
-        MovePiece movePiece = new MovePiece(rules, board);
         boolean success = false;
         switch(state) {
             case ATTACKERS_TURN:
                 if(board.getAttackers().containsKey(from))
-                    success = movePiece.movePiece(from, to);
+                    success = board.movePiece(from, to);
                 break;
             case DEFENDERS_TURN:
                 if(board.getDefenders().containsKey(from))
-                    success = movePiece.movePiece(from, to);
+                    success = board.movePiece(from, to);
                 break;
             case ATTACKERS_WIN:
             case DEFENDERS_WIN:
@@ -81,7 +80,7 @@ public class Game {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         Rules rules = new BrandubRules();
-        Game game = new Game(rules, new BrandubBoard(rules), GameState.ATTACKERS_TURN);
+        Game game = new Game(rules, new BrandubhBoard(rules), GameState.ATTACKERS_TURN);
         game.board.printBoard();
         System.out.print("\n\n");
         game.movePiece(new Point(1, 8), new Point(5, 8));
