@@ -25,7 +25,27 @@ public class Game {
         this.state = state;
     }
 
-    public boolean movePiece(Point from, Point to) {
+    public boolean movePiece(String move) {
+        try {
+            String[] splitCaptures = move.split("x");
+            String moveString = splitCaptures[0];
+            String capturesString = null;
+            if (splitCaptures.length > 1) {
+                capturesString = splitCaptures[1];
+            }
+            String[] splitMoves = moveString.split("-");
+            String from = splitMoves[0];
+            String to = splitMoves[1];
+            int fromX = from.charAt(0) - 64;
+            int fromY = Character.getNumericValue(from.charAt(1));
+            int toX = to.charAt(0) - 64;
+            int toY = Character.getNumericValue(to.charAt(1));
+            return movePiece(new Point(fromX, fromY), new Point(toX, toY));
+        } catch(Exception ignored) { }
+        return false;
+    }
+
+    private boolean movePiece(Point from, Point to) {
         boolean success = false;
         switch(state) {
             case ATTACKERS_TURN:
@@ -83,6 +103,7 @@ public class Game {
         Game game = new Game(rules, new BrandubhBoard(rules), GameState.ATTACKERS_TURN);
         game.board.printBoard();
         System.out.print("\n\n");
+        game.movePiece("E5-E7");
         game.movePiece(new Point(1, 8), new Point(5, 8));
         game.movePiece(new Point(6, 4), new Point(6, 3));
         game.movePiece(new Point(11, 8), new Point(7, 8));
