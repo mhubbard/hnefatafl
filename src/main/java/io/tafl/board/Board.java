@@ -93,14 +93,14 @@ public abstract class Board {
             pieceType = getAttackers().get(from);
         } else return false;
 
-        if(pieceType == PieceType.KING && rules.singleMoveKing()
+        if(pieceType == PieceType.KING && rules.isSingleMoveKing()
            && !getKing().adjacentPoints(getDimension()).contains(to))
             return false;
 
         if(pieceType != PieceType.KING && getCornerPoints().contains(to))
             return false;
 
-        if(getThrone().equals(to) && (pieceType != PieceType.KING || !rules.canKingReenterThrone()))
+        if(getThrone().equals(to) && (pieceType != PieceType.KING || !rules.isKingCanReenterThrone()))
             return false;
 
         for(Point point: from.getPathTo(to))

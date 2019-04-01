@@ -45,13 +45,13 @@ public class Game {
                 state = GameState.DEFENDERS_TURN;
                 if(!board.getDefenders().values().contains(PieceType.KING)
                         || !canSideMove(board.getDefenders())
-                        || (rules.allowEncircle() && board.checkEncircle(board.getAttackers(), board.getDefenders())))
+                        || (rules.isAllowEncircle() && board.checkEncircle(board.getAttackers(), board.getDefenders())))
                     state = GameState.ATTACKERS_WIN;
             } else if(state == GameState.DEFENDERS_TURN) {
                 state = GameState.ATTACKERS_TURN;
                 if(kingEscaped()
                         || !canSideMove(board.getAttackers())
-                        || (rules.allowEncircle() && board.checkEncircle(board.getDefenders(), board.getAttackers())))
+                        || (rules.isAllowEncircle() && board.checkEncircle(board.getDefenders(), board.getAttackers())))
                     state = GameState.DEFENDERS_WIN;
             }
         }
@@ -64,7 +64,7 @@ public class Game {
      * @return true if the king escaped, false otherwise
      */
     private boolean kingEscaped() {
-        return (rules.edgeEscape() && board.getEdges().contains(board.getKing()))
+        return (rules.isEdgeEscape() && board.getEdges().contains(board.getKing()))
                || board.getCornerPoints().contains(board.getKing());
     }
 
