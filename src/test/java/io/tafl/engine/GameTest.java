@@ -8,6 +8,5 @@ public class GameTest {
     @Test
     @Ignore
     public void testGame() {
-
     }
 }

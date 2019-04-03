@@ -4,8 +4,6 @@ import io.tafl.engine.board.Board;
 import io.tafl.engine.board.Move;
 import io.tafl.engine.board.PieceType;
 import io.tafl.engine.board.Point;
-import io.tafl.engine.board.impl.HnefataflBoard;
-import io.tafl.engine.rules.CopenhagenRules;
 import io.tafl.engine.rules.Rules;
 import io.tafl.engine.utils.NotationParser;
 
