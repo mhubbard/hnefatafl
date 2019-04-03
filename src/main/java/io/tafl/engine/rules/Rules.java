@@ -1,4 +1,4 @@
-package io.tafl.rules;
+package io.tafl.engine.rules;
 
 public class Rules {
     private boolean edgeEscape;

@@ -1,4 +1,4 @@
-package io.tafl.board;
+package io.tafl.engine.board;
 
 
 public enum PieceType {

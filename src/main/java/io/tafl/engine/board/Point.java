@@ -1,4 +1,4 @@
-package io.tafl.board;
+package io.tafl.engine.board;
 
 import lombok.Value;
 

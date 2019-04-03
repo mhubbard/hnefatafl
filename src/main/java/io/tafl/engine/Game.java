@@ -1,11 +1,13 @@
-package io.tafl;
+package io.tafl.engine;
 
-import io.tafl.board.Board;
-import io.tafl.board.PieceType;
-import io.tafl.board.Point;
-import io.tafl.board.impl.BrandubhBoard;
-import io.tafl.rules.BrandubRules;
-import io.tafl.rules.Rules;
+import io.tafl.engine.board.Board;
+import io.tafl.engine.board.Move;
+import io.tafl.engine.board.PieceType;
+import io.tafl.engine.board.Point;
+import io.tafl.engine.board.impl.BrandubhBoard;
+import io.tafl.engine.rules.BrandubRules;
+import io.tafl.engine.rules.Rules;
+import io.tafl.engine.utils.NotationParser;
 
 import lombok.Data;
 
@@ -25,22 +27,10 @@ public class Game {
         this.state = state;
     }
 
-    public boolean movePiece(String move) {
+    public boolean movePiece(String moveNotation) {
         try {
-            String[] splitCaptures = move.split("x");
-            String moveString = splitCaptures[0];
-            String capturesString = null;
-            if (splitCaptures.length > 1) {
-                capturesString = splitCaptures[1];
-            }
-            String[] splitMoves = moveString.split("-");
-            String from = splitMoves[0];
-            String to = splitMoves[1];
-            int fromX = from.charAt(0) - 64;
-            int fromY = Character.getNumericValue(from.charAt(1));
-            int toX = to.charAt(0) - 64;
-            int toY = Character.getNumericValue(to.charAt(1));
-            return movePiece(new Point(fromX, fromY), new Point(toX, toY));
+            Move move = NotationParser.parse(moveNotation);
+            return movePiece(move.getFrom(), move.getTo());
         } catch(Exception ignored) { }
         return false;
     }

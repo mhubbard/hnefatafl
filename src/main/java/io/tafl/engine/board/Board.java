@@ -1,6 +1,6 @@
-package io.tafl.board;
+package io.tafl.engine.board;
 
-import io.tafl.rules.Rules;
+import io.tafl.engine.rules.Rules;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,20 +8,50 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class Board {
+public class Board {
 
+    protected static Set<Point> edges;
+    protected static Set<Point> cornerPoints;
+    protected static Point throne;
     protected Rules rules;
+    protected int dimension;
     protected HashMap<Point, PieceType> attackers;
     protected HashMap<Point, PieceType> defenders;
     protected Point king;
 
-    public abstract int getDimension();
-    public abstract Set<Point> getEdges();
-    public abstract Set<Point> getCornerPoints();
-    public abstract Point getThrone();
-
     protected Board(Rules rules) {
         this.rules = rules;
+    }
+
+    protected Board(Rules rules, int dimension) {
+        this.rules = rules;
+        this.dimension = dimension;
+        edges = new HashSet<>(dimension * 4);
+        cornerPoints = new HashSet<>(4);
+        attackers = new HashMap<>();
+        defenders = new HashMap<>();
+        throne = new Point((int)Math.round(dimension/2.0), (int)Math.round(dimension/2.0));
+        king = throne;
+
+        for(int i = 1; i <= dimension; i++) {
+            edges.add(new Point(i, 1));
+            edges.add(new Point(i, dimension));
+            edges.add(new Point(1, i));
+            edges.add(new Point(dimension, i));
+        }
+
+        cornerPoints.add(new Point(1, 1));
+        cornerPoints.add(new Point(1, dimension));
+        cornerPoints.add(new Point(dimension, 1));
+        cornerPoints.add(new Point(dimension, dimension));
+    }
+
+    public Set<Point> getEdges() {
+        return edges;
+    }
+
+    public Set<Point> getCornerPoints() {
+        return cornerPoints;
     }
 
     public HashMap<Point, PieceType> getAttackers() {
@@ -40,6 +70,76 @@ public abstract class Board {
         this.king = king;
     }
 
+    public char[][] toArray() {
+        char[][] board = new char[dimension][dimension];
+        for(int i = 0; i < dimension; i++) {
+            for(int j = 0; j < dimension; j++) {
+                board[i][j] = ' ';
+                Point point = new Point(i+1, j+1);
+
+                if(cornerPoints.contains(point)) {
+                    board[i][j] = 'X';
+                }
+
+                if(attackers.containsKey(point))
+                    board[i][j] = 'A';
+
+                if(defenders.containsKey(point)) {
+                    PieceType type = defenders.get(point);
+                    if (type == PieceType.DEFENDER)
+                        board[i][j] = 'D';
+                    else if (type == PieceType.KING)
+                        board[i][j] = 'K';
+                }
+
+            }
+        }
+        return board;
+    }
+
+    public static Board fromArray(Rules rules, char[][] boardArray) {
+        Board board = new Board(rules, boardArray.length);
+        for(int i = 0; i < board.dimension; i++) {
+            for(int j = 0; j < board.dimension; j++) {
+                char square = boardArray[i][j];
+
+                Point point = new Point(i+1, j+1);
+
+                switch (square) {
+                    case 'A':
+                        board.attackers.put(point, PieceType.ATTACKER);
+                        break;
+                    case 'D':
+                        board.defenders.put(point, PieceType.DEFENDER);
+                        break;
+                    case 'K':
+                        board.defenders.put(point, PieceType.KING);
+                }
+            }
+        }
+        return board;
+    }
+
+    /**
+     * Check if the given piece has a open spot to move to.
+     * @return true if there's at least one open space adjacent to the give point.
+     */
+    public boolean pieceCanMove(Point point) {
+        if(getKing().equals(point)) {
+            return getKing().adjacentPoints(dimension).stream()
+                    .filter(adjacentPoint -> getDefenders().containsKey(adjacentPoint)
+                                             || getAttackers().containsKey(adjacentPoint))
+                    .collect(Collectors.toSet()).isEmpty();
+        } else {
+            return point.adjacentPoints(dimension).stream()
+                    .filter(adjacentPoint -> getDefenders().containsKey(adjacentPoint)
+                                             || getAttackers().containsKey(adjacentPoint)
+                                             || cornerPoints.contains(adjacentPoint)
+                                             || throne.equals(adjacentPoint))
+                    .collect(Collectors.toSet()).isEmpty();
+        }
+    }
+
     /**
      * Check if the opposingSide is encircled.
      * <p>
@@ -51,8 +151,8 @@ public abstract class Board {
      * @return true if the opposingSide is encircled, false otherwise.
      */
     public boolean checkEncircle(HashMap<Point, PieceType> encirclingSide, HashMap<Point, PieceType> opposingSide) {
-        Set<Point> checked = new HashSet<>(getDimension() * getDimension());
-        LinkedHashSet<Point> queue = new LinkedHashSet<>(getEdges());
+        Set<Point> checked = new HashSet<>(dimension * dimension);
+        LinkedHashSet<Point> queue = new LinkedHashSet<>(edges);
 
         while(!queue.isEmpty()) {
             Point point = queue.iterator().next();
@@ -60,7 +160,7 @@ public abstract class Board {
                 return false;
 
             if(!encirclingSide.containsKey(point)) {
-                Set<Point> adjacentPoints = point.adjacentPoints(getDimension());
+                Set<Point> adjacentPoints = point.adjacentPoints(dimension);
                 adjacentPoints.forEach(adjacentPoint -> {
                     if(!queue.contains(adjacentPoint) && !checked.contains(adjacentPoint))
                         queue.add(adjacentPoint);
@@ -81,7 +181,7 @@ public abstract class Board {
      */
     public boolean movePiece(Point from, Point to) {
         if(from.equals(to) || !from.sharesAxisWith(to)
-           || !from.isOnBoard(getDimension()) || !to.isOnBoard(getDimension()))
+           || !from.isOnBoard(dimension) || !to.isOnBoard(dimension))
             return false;
 
         boolean isAttacker = false;
@@ -94,13 +194,13 @@ public abstract class Board {
         } else return false;
 
         if(pieceType == PieceType.KING && rules.isSingleMoveKing()
-           && !getKing().adjacentPoints(getDimension()).contains(to))
+           && !getKing().adjacentPoints(dimension).contains(to))
             return false;
 
-        if(pieceType != PieceType.KING && getCornerPoints().contains(to))
+        if(pieceType != PieceType.KING && cornerPoints.contains(to))
             return false;
 
-        if(getThrone().equals(to) && (pieceType != PieceType.KING || !rules.isKingCanReenterThrone()))
+        if(throne.equals(to) && (pieceType != PieceType.KING || !rules.isKingCanReenterThrone()))
             return false;
 
         for(Point point: from.getPathTo(to))
@@ -160,8 +260,8 @@ public abstract class Board {
     private void checkCapture(Point adjacent, Point sandwichingPoint, HashMap<Point, PieceType> alliedPieces, Set<Point> captures) {
         if(!getKing().equals(adjacent)
            || (rules.isWeakKing()
-               && !getThrone().equals(getKing())
-               && !getKing().adjacentPoints(getDimension()).contains(getThrone()))) {
+               && !throne.equals(getKing())
+               && !getKing().adjacentPoints(dimension).contains(throne))) {
             if (isAllyOrHostile(sandwichingPoint, alliedPieces))
                 captures.add(adjacent);
         } else if(checkKingSurrounded())
@@ -173,7 +273,7 @@ public abstract class Board {
      * @return true if the board.getKing() is surrounded, false otherwise.
      */
     private boolean checkKingSurrounded() {
-        Set<Point> adjacentPoints = getKing().adjacentPoints(getDimension());
+        Set<Point> adjacentPoints = getKing().adjacentPoints(dimension);
         return adjacentPoints.stream().filter(point -> isAllyOrHostile(point, getAttackers()))
                        .collect(Collectors.toSet())
                        .size() == 4;
@@ -188,69 +288,22 @@ public abstract class Board {
     private boolean isAllyOrHostile(Point point, HashMap<Point, PieceType> alliedPieces) {
         return !(getKing().equals(point) && rules.isWeaponlessKing())
                && (alliedPieces.containsKey(point)
-                   || getCornerPoints().contains(point)
-                   || (getThrone().equals(point) && !getThrone().equals(getKing())));
-    }
-
-    /**
-     * Check if the given piece has a open spot to move to.
-     * @return true if there's at least one open space adjacent to the give point.
-     */
-    public boolean pieceCanMove(Point point) {
-        if(getKing().equals(point)) {
-            return getKing().adjacentPoints(getDimension()).stream()
-                    .filter(adjacentPoint -> getDefenders().containsKey(adjacentPoint)
-                                             || getAttackers().containsKey(adjacentPoint))
-                    .collect(Collectors.toSet()).isEmpty();
-        } else {
-            return point.adjacentPoints(getDimension()).stream()
-                    .filter(adjacentPoint -> getDefenders().containsKey(adjacentPoint)
-                                             || getAttackers().containsKey(adjacentPoint)
-                                             || getCornerPoints().contains(adjacentPoint)
-                                             || getThrone().equals(adjacentPoint))
-                    .collect(Collectors.toSet()).isEmpty();
-        }
-    }
-
-    public char[][] toArray() {
-        char[][] board = new char[getDimension()][getDimension()];
-        for(int i = 0; i < getDimension(); i++) {
-            for(int j = 0; j < getDimension(); j++) {
-                board[i][j] = ' ';
-                Point point = new Point(i+1, j+1);
-
-                if(getCornerPoints().contains(point)) {
-                    board[i][j] = 'X';
-                }
-
-                if(attackers.containsKey(point))
-                    board[i][j] = 'A';
-
-                if(defenders.containsKey(point)) {
-                    PieceType type = defenders.get(point);
-                    if (type == PieceType.DEFENDER)
-                        board[i][j] = 'D';
-                    else if (type == PieceType.KING)
-                        board[i][j] = 'K';
-                }
-
-            }
-        }
-        return board;
+                   || cornerPoints.contains(point)
+                   || (throne.equals(point) && !throne.equals(getKing())));
     }
 
     public void printBoard() {
-        for(int i = getDimension(); i > 0; i--) {
-            for(int j = 1; j <= getDimension(); j++) {
+        for(int i = dimension; i > 0; i--) {
+            for(int j = 1; j <= dimension; j++) {
                 System.out.print("+-");
             }
             System.out.print("+\n");
-            for(int j = 1; j <= getDimension(); j++) {
+            for(int j = 1; j <= dimension; j++) {
                 System.out.print('|');
                 char print = ' ';
                 Point point = new Point(j, i);
 
-                if(getCornerPoints().contains(point)) {
+                if(cornerPoints.contains(point)) {
                     print = 'X';
                 }
 
@@ -270,7 +323,7 @@ public abstract class Board {
             System.out.print('|');
             System.out.print('\n');
         }
-        for(int j = 1; j <= getDimension(); j++) {
+        for(int j = 1; j <= dimension; j++) {
             System.out.print("+-");
         }
         System.out.print("+\n");

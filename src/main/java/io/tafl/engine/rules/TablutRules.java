@@ -1,8 +1,8 @@
-package io.tafl.rules;
+package io.tafl.engine.rules;
 
-public class BrandubRules extends Rules {
+public class TablutRules extends Rules {
 
-    public BrandubRules() {
+    public TablutRules() {
         super(false,
               false,
               false,

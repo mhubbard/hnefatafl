@@ -1,4 +1,4 @@
-package io.tafl;
+package io.tafl.engine;
 
 public enum GameState {
 
