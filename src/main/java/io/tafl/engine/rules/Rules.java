@@ -1,6 +1,16 @@
 package io.tafl.engine.rules;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Rules {
+
+    // Rule presets
+    public static final Rules BRANDUB = new Rules(false, false, false, false, false, false);
+    public static final Rules TABLUT = new Rules(false, false, false, false, false, false);
+    public static final Rules COPENHAGEN = new Rules(false, true, false, false, true,false);
+    public static final Rules FETLAR = new Rules(false, false, false, false, true, false);
+
     private boolean edgeEscape;
     private boolean allowEncircle;
     private boolean weaponlessKing;

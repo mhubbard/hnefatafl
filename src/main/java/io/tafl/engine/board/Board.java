@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 
 public class Board {
 
+    private static final char EMPTY = ' ';
+    private static final char CORNER = 'X';
+    private static final char ATTACKER = 'A';
+    private static final char DEFENDER = 'D';
+    private static final char KING = 'K';
+
     protected static Set<Point> edges;
     protected static Set<Point> cornerPoints;
     protected static Point throne;
@@ -74,22 +80,21 @@ public class Board {
         char[][] board = new char[dimension][dimension];
         for(int i = 0; i < dimension; i++) {
             for(int j = 0; j < dimension; j++) {
-                board[i][j] = ' ';
+                board[i][j] = EMPTY;
                 Point point = new Point(i+1, j+1);
 
-                if(cornerPoints.contains(point)) {
-                    board[i][j] = 'X';
-                }
-
-                if(attackers.containsKey(point))
-                    board[i][j] = 'A';
-
-                if(defenders.containsKey(point)) {
+                if(cornerPoints.contains(point))
+                    board[i][j] = CORNER;
+                else if(point.equals(throne) && !king.equals(throne))
+                    board[i][j] = CORNER;
+                else if(attackers.containsKey(point))
+                    board[i][j] = ATTACKER;
+                else if(defenders.containsKey(point)) {
                     PieceType type = defenders.get(point);
                     if (type == PieceType.DEFENDER)
-                        board[i][j] = 'D';
+                        board[i][j] = DEFENDER;
                     else if (type == PieceType.KING)
-                        board[i][j] = 'K';
+                        board[i][j] = KING;
                 }
 
             }
@@ -106,13 +111,13 @@ public class Board {
                 Point point = new Point(i+1, j+1);
 
                 switch (square) {
-                    case 'A':
+                    case ATTACKER:
                         board.attackers.put(point, PieceType.ATTACKER);
                         break;
-                    case 'D':
+                    case DEFENDER:
                         board.defenders.put(point, PieceType.DEFENDER);
                         break;
-                    case 'K':
+                    case KING:
                         board.defenders.put(point, PieceType.KING);
                 }
             }
@@ -300,22 +305,22 @@ public class Board {
             System.out.print("+\n");
             for(int j = 1; j <= dimension; j++) {
                 System.out.print('|');
-                char print = ' ';
+                char print = EMPTY;
                 Point point = new Point(j, i);
 
                 if(cornerPoints.contains(point)) {
-                    print = 'X';
+                    print = CORNER;
                 }
 
                 if(attackers.containsKey(point))
-                    print = 'A';
+                    print = ATTACKER;
 
                 if(defenders.containsKey(point)) {
                     PieceType type = defenders.get(point);
                     if (type == PieceType.DEFENDER)
-                        print = 'D';
+                        print = DEFENDER;
                     else if (type == PieceType.KING)
-                        print = 'K';
+                        print = KING;
                 }
 
                 System.out.print(print);
