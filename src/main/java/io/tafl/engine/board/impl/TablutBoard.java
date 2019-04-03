@@ -5,6 +5,7 @@ import io.tafl.engine.board.PieceType;
 import io.tafl.engine.board.Point;
 import io.tafl.engine.rules.Rules;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -18,7 +19,10 @@ public class TablutBoard extends Board {
         super(rules);
         dimension = 9;
         edges = new HashSet<>(dimension * 4);
-        cornerPoints = new HashSet<>(4);
+        cornerPoints = new HashSet<>(Arrays.asList(new Point(1, 1),
+                                                   new Point(1, dimension),
+                                                   new Point(dimension, 1),
+                                                   new Point(dimension, dimension)));
         attackers = new HashMap<>(NUM_ATTACKERS);
         defenders = new HashMap<>(NUM_DEFENDERS);
         throne = new Point(5, 5);
@@ -30,11 +34,6 @@ public class TablutBoard extends Board {
             edges.add(new Point(1, i));
             edges.add(new Point(dimension, i));
         }
-
-        cornerPoints.add(new Point(1, 1));
-        cornerPoints.add(new Point(1, dimension));
-        cornerPoints.add(new Point(dimension, 1));
-        cornerPoints.add(new Point(dimension, dimension));
 
         attackers.put(new Point(1, 4), PieceType.ATTACKER);
         attackers.put(new Point(1, 5), PieceType.ATTACKER);

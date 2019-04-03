@@ -2,6 +2,7 @@ package io.tafl.engine.board;
 
 import io.tafl.engine.rules.Rules;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -23,11 +24,14 @@ public class Board {
         this.rules = rules;
     }
 
-    protected Board(Rules rules, int dimension) {
+    private Board(Rules rules, int dimension) {
         this.rules = rules;
         this.dimension = dimension;
         edges = new HashSet<>(dimension * 4);
-        cornerPoints = new HashSet<>(4);
+        cornerPoints = new HashSet<>(Arrays.asList(new Point(1, 1),
+                                                   new Point(1, dimension),
+                                                   new Point(dimension, 1),
+                                                   new Point(dimension, dimension)));
         attackers = new HashMap<>();
         defenders = new HashMap<>();
         throne = new Point((int)Math.round(dimension/2.0), (int)Math.round(dimension/2.0));
@@ -40,10 +44,6 @@ public class Board {
             edges.add(new Point(dimension, i));
         }
 
-        cornerPoints.add(new Point(1, 1));
-        cornerPoints.add(new Point(1, dimension));
-        cornerPoints.add(new Point(dimension, 1));
-        cornerPoints.add(new Point(dimension, dimension));
     }
 
     public Set<Point> getEdges() {
