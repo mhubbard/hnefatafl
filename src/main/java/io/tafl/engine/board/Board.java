@@ -20,11 +20,12 @@ public class Board {
     protected static Set<Point> edges;
     protected static Set<Point> cornerPoints;
     protected static Point throne;
-    protected Rules rules;
     protected int dimension;
     protected HashMap<Point, PieceType> attackers;
     protected HashMap<Point, PieceType> defenders;
     protected Point king;
+
+    private Rules rules;
 
     protected Board(Rules rules) {
         this.rules = rules;
