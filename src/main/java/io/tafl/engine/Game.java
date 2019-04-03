@@ -4,8 +4,8 @@ import io.tafl.engine.board.Board;
 import io.tafl.engine.board.Move;
 import io.tafl.engine.board.PieceType;
 import io.tafl.engine.board.Point;
-import io.tafl.engine.board.impl.BrandubhBoard;
-import io.tafl.engine.rules.BrandubRules;
+import io.tafl.engine.board.impl.HnefataflBoard;
+import io.tafl.engine.rules.CopenhagenRules;
 import io.tafl.engine.rules.Rules;
 import io.tafl.engine.utils.NotationParser;
 
@@ -85,19 +85,5 @@ public class Game {
      */
     private boolean canSideMove(HashMap<Point, PieceType> pieces) {
         return pieces.keySet().stream().filter(board::pieceCanMove).collect(Collectors.toSet()).isEmpty();
-    }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        Rules rules = new BrandubRules();
-        Game game = new Game(rules, new BrandubhBoard(rules), GameState.ATTACKERS_TURN);
-        game.board.printBoard();
-        System.out.print("\n\n");
-        game.movePiece("E5-E7");
-        game.movePiece(new Point(1, 8), new Point(5, 8));
-        game.movePiece(new Point(6, 4), new Point(6, 3));
-        game.movePiece(new Point(11, 8), new Point(7, 8));
-        game.board.printBoard();
-        System.out.println("\n\n"+ (System.currentTimeMillis() - start));
     }
 }
